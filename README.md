@@ -1,6 +1,6 @@
 # ![logo](https://sovlet.github.io/sov3ka/media/icons/icon64.png) Squirrels Library
 
-![](https://app.codacy.com/project/badge/Grade/af833611ee274ffd907715424805f6eb) ![](https://img.shields.io/badge/coverage-90%25-green) ![](https://img.shields.io/badge/issues-0-lime)
+![](https://app.codacy.com/project/badge/Grade/af833611ee274ffd907715424805f6eb) ![](https://img.shields.io/badge/coverage-99%25-lime) ![](https://img.shields.io/badge/issues-0-lime)
 
 --------------
 
