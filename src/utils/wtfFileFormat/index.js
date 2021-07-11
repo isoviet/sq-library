@@ -1,4 +1,4 @@
-//  Module:     src/utils/TocFileFormat
+//  Module:     src/utils/wtfFileFormat
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
@@ -21,6 +21,8 @@ class WtfFileFormat {
                 if(char === value.substr(value.length - 1))
                     return value.substr(1, value.length - 2)
             default:
+                if(value.indexOf(".") !== -1)
+                    return parseFloat(value)
                 return parseInt(value, 10)
         }
     }
@@ -28,12 +30,12 @@ class WtfFileFormat {
         let data = {};
         let last = data;
         for(let line of raw.split('\n')) {
-            let [ prefix, content ] = lines[i].replace(/ +/g, ' ').match(/^([A-Z]+)*\s([\a-\z\A-\Z\0-\9\.\'\"\s]+);*/);
+            let [prefix, content] = lines[i].replace(/ +/g, ' ').match(/^([A-Z]+)*\s([\a-\z\A-\Z\0-\9\.\'\"\s]+);*/);
             switch(prefix) {
                 case 'CAT':
                     last = data[this.parseValue(content)] = {}
                 case 'SET':
-                    let [ varName, varValue ] = content.split(' ');
+                    let [varName, varValue] = content.split(' ');
                     last[varName] = this.parseValue(varValue);
                     break
                 default:

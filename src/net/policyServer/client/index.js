@@ -1,8 +1,8 @@
-//  Module:		src/net/server
-//  Project:	sq-lib
-//  Author:		soviet
-//  E-mail:		soviet@s0viet.ru
-//  Web:		https://s0viet.ru/
+//  Module:     src/net/policyServer/client
+//  Project:    sq-lib
+//  Author:     soviet
+//  E-mail:     soviet@s0viet.ru
+//  Web:        https://s0viet.ru/
 
 const net = require('net')
 const EventEmitter2 = require('eventemitter2')

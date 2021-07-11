@@ -7,14 +7,15 @@
 const equal = require('fast-deep-equal')
 const sq = require('../index.js')
 
-const log = new sq.Logger({
+sq.Logger.setOptions({
     logFile: 0,
     debug: 0,
     info: 1,
     warn: 1,
     error: 1,
     fatal: 1
-}).info
+})
+const log = sq.Logger.info;
 
 async function clear() {
     console.clear();
@@ -31,7 +32,7 @@ async function pause() {
     });
 }
 
-async function stepZero() {
+async function hello() {
     log('main', 'Добро пожаловать в тестирование sq-lib!\r\n\
     Данный скрипт поможет вам протестировать работу библиотеки.\r\n\
     Вам будет предложено выполнить несколько действий.\r\n\
@@ -202,10 +203,11 @@ async function stepFour() {
 }
 
 (async() => {
-    await stepZero();
+    await hello();
     await stepOne();
     await stepTwo();
     await stepThree();
-    await stepFour()
+    await stepFour();
+    process.exit()
 })();
 

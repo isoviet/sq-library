@@ -1,8 +1,8 @@
-//  Module:		src/net/protocol/server
-//  Project:	sq-lib
-//  Author:		soviet
-//  E-mail:		soviet@s0viet.ru
-//  Web:		https://s0viet.ru/
+//  Module:     src/net/protocol/server
+//  Project:    sq-lib
+//  Author:     soviet
+//  E-mail:     soviet@s0viet.ru
+//  Web:        https://s0viet.ru/
 
 const { Protocol } = require('data/protocol')
 const { PlayerInfoParser } = require('src/utils/playerInfoParser')
@@ -15,7 +15,7 @@ const ProtocolServer = new CompiledProtodef(
 	Compiler.readCompiler.compile(Protocol.server.readCode)
 )
 
-const PacketInfoParser = new PlayerInfoParser(ProtocolServer)
+PlayerInfoParser.setProtocol(ProtocolServer)
 
 class PacketServer {
 	constructor(type, data) {
@@ -32,7 +32,7 @@ class PacketServer {
 				... this,
 				... {
 					'data': this.type == 'PacketInfo' || this.type == 'PacketInfoNet' ? {
-						'data': PacketInfoParser.write(this.data.data),
+						'data': PlayerInfoParser.write(this.data.data),
 						'mask': this.data.mask
 					} : this.data
 				}
@@ -51,7 +51,7 @@ class PacketServer {
 				... packet,
 				... {
 					'data': packet.type == 'PacketInfo' || packet.type == 'PacketInfoNet' ? {
-						'data': PacketInfoParser.read(packet.data.data, packet.data.mask),
+						'data': PlayerInfoParser.read(packet.data.data, packet.data.mask),
 						'mask': packet.data.mask
 					} : packet.data
 				},
