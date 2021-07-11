@@ -194,34 +194,17 @@ async function stepThree() {
 
 async function stepFour() {
     await clear();
-    log('main', 'Тест #4\r\n\
-    Сейчас будет создан тестовый пакет клиента.\r\n\
-    Данный пакет будет сконвертирован в байтовое представление и обратно.\r\n\
-    \r\n\
-    Цель теста: проверка работы путём обратимости.\r\n\
-    Использованные классы: PacketClient.\r\n\
+    log('main', 'Тесты пройдены\r\n\
+    Вы успешно завершили все тесты sq-lib.\r\n\
     \r\n\
     Нажмите любую клавишу для продолжения..\r\n');
-    await pause();
-    let packet = new sq.PacketClient('LOGIN', BigInt(0), 1, 2, '#3', 4, 5, 'optional #6');
-    let buffer = packet.toBuffer();
-    log('main', 'Пакет:\r\n', packet, '\r\n')
-    log('main', 'Байты:\r\n', buffer, '\r\n')
-    let packet2 = sq.PacketClient.from(buffer);
-    packet2.data[0] = packet2.data[0].valueOf();
-    let buffer2 = packet2.toBuffer();
-    log('main', 'Пакет:\r\n', packet2, '\r\n')
-    log('main', 'Байты:\r\n', buffer2, '\r\n')
-    log('main', 'Пакеты совпадают:\r\n', equal(packet, packet2) ? 'ДА' : 'НЕТ', '\r\n')
-    log('main', 'Байты совпадают:\r\n', equal(buffer, buffer2) ? 'ДА' : 'НЕТ', '\r\n')
-    log('main', 'Нажмите любую клавишу для продолжения..\r\n');
-    await pause();
+    await pause()
 }
 
 (async() => {
-    // await stepZero();
-    // await stepOne();
-    // await stepTwo();
+    await stepZero();
+    await stepOne();
+    await stepTwo();
     await stepThree();
     await stepFour()
 })();
