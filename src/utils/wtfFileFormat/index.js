@@ -21,7 +21,7 @@ class WtfFileFormat {
                 if(char === value.substr(value.length - 1))
                     return value.substr(1, value.length - 2)
             default:
-                return parseInt(value)
+                return parseInt(value, 10)
         }
     }
     static parseContent(content) {
