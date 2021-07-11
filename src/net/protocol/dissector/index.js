@@ -1,8 +1,8 @@
-//	Module:		src/net/protocol/dissector
-//	Project:	sq-lib
-//	Author:		soviet
-//	E-mail:		soviet@s0viet.ru
-//	Web:		https://s0viet.ru/
+//  Module:		src/net/protocol/dissector
+//  Project:	sq-lib
+//  Author:		soviet
+//  E-mail:		soviet@s0viet.ru
+//  Web:		https://s0viet.ru/
 
 const { Logger } = require('src/utils/logger')
 const { Constants } = require('data/constants')
