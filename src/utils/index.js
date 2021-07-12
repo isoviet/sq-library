@@ -1,8 +1,8 @@
-//  Module:		src/utils
-//  Project:	sq-lib
-//  Author:		soviet
-//  E-mail:		soviet@s0viet.ru
-//  Web:		https://s0viet.ru/
+//  Module:     src/utils
+//  Project:    sq-lib
+//  Author:     soviet
+//  E-mail:     soviet@s0viet.ru
+//  Web:        https://s0viet.ru/
 
 module.exports = {
 	... require('@sq-lib/src/utils/logger'),

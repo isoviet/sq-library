@@ -1,8 +1,8 @@
-//  Module:		src/net/server
-//  Project:	sq-lib
-//  Author:		soviet
-//  E-mail:		soviet@s0viet.ru
-//  Web:		https://s0viet.ru/
+//  Module:     src/net/server
+//  Project:    sq-lib
+//  Author:     soviet
+//  E-mail:     soviet@s0viet.ru
+//  Web:        https://s0viet.ru/
 
 const net = require('net')
 const EventEmitter2 = require('eventemitter2')
@@ -13,35 +13,28 @@ const { PacketClient } = require('@sq-lib/src/net/protocol')
 
 class Server extends EventEmitter2 {
 	constructor(options) {
-		super({
-			wildcard: true
-		})
+		super({wildcard: true})
 		this.options = options
 		this.socket = new net.Server({
 			allowHalfOpen: false,
 			pauseOnConnect: true
 		})
 		this.clients = []
-		this.listenTo(
-			this.socket,
-			{
-				close: 'server.close',
-				connection: 'server.connection',
-				error: 'server.error',
-				listening: 'server.listening'
-			}
-		)
+		this.listenTo(this.socket, {
+			close: 'server.close',
+			connection: 'server.connection',
+			error: 'server.error',
+			listening: 'server.listening'
+		})
 		this.on('server.connection', this.onconnect)
 		this.on('client.close', this.ondisconnect)
 	}
 	listen() {
 		Logger.debug('net', 'Server.listen')
-		this.socket.listen(
-			{
-				port: this.options.port || 11111,
-				host: this.options.host || '0.0.0.0'
-			}
-		 )
+		this.socket.listen({
+			port: this.options.port || 11111,
+			host: this.options.host || '0.0.0.0'
+		})
 	}
 	close() {
 		Logger.debug('net', 'Server.close')
@@ -52,9 +45,7 @@ class Server extends EventEmitter2 {
 	onconnect(socket) {
 		Logger.debug('net', 'Server.onconnect')
 		let client = new ServerClient(this.options, socket)
-		client.onAny((event, ...args) => {
-			this.emit(event, client, ...args)
-		})
+		client.onAny((event, ...args) => this.emit(event, client, ...args))
 		this.clients.push(client)
 		if(!this.options.manualOpen)
 			client.open()

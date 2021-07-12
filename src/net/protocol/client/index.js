@@ -1,8 +1,8 @@
-//  Module:		src/net/protocol/client
-//  Project:	sq-lib
-//  Author:		soviet
-//  E-mail:		soviet@s0viet.ru
-//  Web:		https://s0viet.ru/
+//  Module:     src/net/protocol/client
+//  Project:    sq-lib
+//  Author:     soviet
+//  E-mail:     soviet@s0viet.ru
+//  Web:        https://s0viet.ru/
 
 const { Protocol } = require('@sq-lib/data/protocol')
 const { ProtoDefCompiler, CompiledProtodef } = require('protodef').Compiler

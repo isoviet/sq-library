@@ -13,9 +13,7 @@ const { PolicyServerClient } = require('@sq-lib/src/net/policyServer/client')
 
 class PolicyServer extends EventEmitter2 {
 	constructor(options) {
-		super({
-			wildcard: true
-		})
+		super({wildcard: true})
 		this.options = options
 		this.socket = new net.Server({
 			allowHalfOpen: false,

@@ -1,8 +1,8 @@
-//  Module:		src/net/server/client
-//  Project:	sq-lib
-//  Author:		soviet
-//  E-mail:		soviet@s0viet.ru
-//  Web:		https://s0viet.ru/
+//  Module:     src/net/server/client
+//  Project:    sq-lib
+//  Author:     soviet
+//  E-mail:     soviet@s0viet.ru
+//  Web:        https://s0viet.ru/
 
 const net = require('net')
 const EventEmitter2 = require('eventemitter2')
@@ -13,33 +13,26 @@ const { PacketClient, PacketServer } = require('@sq-lib/src/net/protocol')
 
 class ServerClient extends EventEmitter2 {
 	constructor(options, socket) {
-		super({
-			wildcard: true
-		})
+		super({wildcard: true})
 		this.options = options
 		this.socket = socket
 		this.dissector = new Dissector()
-		this.listenTo(
-			this.socket,
-			{
-				close: 'client.close',
-				connect: 'client.connect',
-				data: 'client.data',
-				drain: 'client.drain',
-				end: 'client.end',
-				error: 'client.error',
-				lookup: 'client.lookup',
-				ready: 'client.ready',
-				timeout: 'client.timeout'
-			}
-		)
+		this.listenTo(this.socket, {
+			close: 'client.close',
+			connect: 'client.connect',
+			data: 'client.data',
+			drain: 'client.drain',
+			end: 'client.end',
+			error: 'client.error',
+			lookup: 'client.lookup',
+			ready: 'client.ready',
+			timeout: 'client.timeout'
+		})
 		this.socket.setTimeout(this.options.timeout || 45000)
 	}
 	open() {
 		Logger.debug('net', 'ServerClient.open')
-		this.socket.on('data', (chunk) => { 
-			return this.ondata(chunk)
-		})
+		this.socket.on('data', (chunk) => this.ondata(chunk))
 		this.socket.resume()
 	}
 	close() {

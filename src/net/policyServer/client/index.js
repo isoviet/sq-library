@@ -51,9 +51,10 @@ class PolicyServerClient extends EventEmitter2 {
 		this.state.recv += chunk.toString('latin1')
 		if(!this.data.request.startsWith(this.state.recv))
 			throw new Error(`unexpected data: "${this.state.recv}"`)
-		else if(this.state.recv === this.data.request)
-			this.socket.end(this.data.content)
-			this.close()
+		if(this.state.recv !== this.data.request)
+			return;
+		this.socket.end(this.data.content)
+		this.close()
 	}
 }
 
