@@ -41,6 +41,8 @@ class ServerClient extends EventEmitter2 {
 	}
 	ondata(chunk) {
 		Logger.debug('net', 'Client.ondata')
+		if(chunk === undefined)
+			return
 		let [buffer, excess] = this.dissector.read(chunk)
 		if(buffer === undefined)
 			return
