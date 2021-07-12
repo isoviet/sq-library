@@ -28,11 +28,11 @@ class PlayerInfoParser {
 	static readVal(type, buffer, offset) {
 		if(typeof type === 'object') {
 			if(type[0] === 'array') {
-				let { value, size } = this.protocol.readCtx[type[1].countType](buffer, offset)
+				let {value, size} = this.protocol.readCtx[type[1].countType](buffer, offset)
 				let bytesRead = size
 				let array = new Array(value)
 				for(let i = 0; i < array.length; i++) {
-					let { value, size } = this.readVal(type[1].type, buffer, offset + bytesRead)
+					let {value, size} = this.readVal(type[1].type, buffer, offset + bytesRead)
 					array[i] = value
 					bytesRead += size
 				}
@@ -46,7 +46,7 @@ class PlayerInfoParser {
 				let bytesRead = 0
 				let container = new Object(null)
 				for(let elem of type[1]) {
-					let { value, size } = this.readVal(elem.type, buffer, offset + bytesRead)
+					let {value, size} = this.readVal(elem.type, buffer, offset + bytesRead)
 					container[elem.name] = value
 					bytesRead += size
 				}
@@ -96,14 +96,14 @@ class PlayerInfoParser {
 	static read(buffer, mask) {
 		if(typeof mask === 'number')
 			mask = this.convertMaskArray(mask)
-		let { value, size } = this.readVal("UInt", buffer, 0)
+		let {value, size} = this.readVal("UInt", buffer, 0)
 		let offset = size
 		let array = new Array(value)
 		for(let i = 0; i < value; i++) {
 			let data = new Object(null)
 			for(let sig of PlayerInfoData) {
 				if(mask.indexOf(sig.name) !== -1) {
-					let { value, size } = this.readVal(sig.signature, buffer, offset)
+					let {value, size} = this.readVal(sig.signature, buffer, offset)
 					offset += size
 					data[sig.name] = value
 				}
