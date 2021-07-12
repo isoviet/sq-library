@@ -5,7 +5,7 @@
 //  Web:        https://s0viet.ru/
 
 module.exports = {
-	... require('data/protocol'),
-	... require('src/net/protocol/client'),
-	... require('src/net/protocol/server')
+	... require('@sq-lib/data/protocol'),
+	... require('@sq-lib/src/net/protocol/client'),
+	... require('@sq-lib/src/net/protocol/server')
 }

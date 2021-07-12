@@ -4,55 +4,52 @@
 //  E-mail:     soviet@s0viet.ru
 //  Web:        https://s0viet.ru/
 
-const { PlayerInfoData } = require('data/playerInfoData')
+const { PlayerInfoData } = require('@sq-lib/data/playerInfoData')
 
 class PlayerInfoParser {
 	static setProtocol(protocol) {
 		this.protocol = protocol
 	}
-	static convertMaskArr(mask) {
-		let arr = [];
-		for(let sig of PlayerInfoData) {
+	static convertMaskArray(mask) {
+		let array = []
+		for(let sig of PlayerInfoData)
 			if(sig.name)
 				if(!!(mask & sig.mask) || sig.mask === 0)
 					arr.push(sig.name)
-		};
-		return arr
+		return array
 	}
-	static convertArrMask(arr) {
-		let mask = 0;
-		for(let sig of PlayerInfoData) {
-			if(arr.indexOf(sig.name) !== -1)
+	static convertArrayMask(array) {
+		let mask = 0
+		for(let sig of PlayerInfoData)
+			if(array.indexOf(sig.name) !== -1)
 				mask = mask | sig.mask
-		};
 		return mask
 	}
 	static readVal(type, buffer, offset) {
-		if(type instanceof Array) {
+		if(typeof type === 'object') {
 			if(type[0] === 'array') {
-				let bytesRead = 0;
-				let { value, size } = this.protocol.readCtx[type[1].countType](buffer, offset);
-				let arr = new Array(value);
-				bytesRead += size;
-				for(let i = 0; i < value; i++) {
-					let { value, size } = this.readVal(type[1].type, buffer, offset + bytesRead);
-					arr[i] = value;
+				let { value, size } = this.protocol.readCtx[type[1].countType](buffer, offset)
+				let bytesRead = size
+				let array = new Array(value)
+				for(let i = 0; i < array.length; i++) {
+					let { value, size } = this.readVal(type[1].type, buffer, offset + bytesRead)
+					array[i] = value
 					bytesRead += size
-				};
+				}
 				return {
-					value: arr,
+					value: array,
 					size: bytesRead
 				}
 			}
 			else if(type[0] == 'container')
 			{
-				let bytesRead = 0;
-				let container = new Object();
+				let bytesRead = 0
+				let container = new Object(null)
 				for(let elem of type[1]) {
-					let { value, size } = this.readVal(elem.type, buffer, offset + bytesRead);
-					container[elem.name] = value;
+					let { value, size } = this.readVal(elem.type, buffer, offset + bytesRead)
+					container[elem.name] = value
 					bytesRead += size
-				};
+				}
 				return {
 					value: container,
 					size: bytesRead
@@ -62,89 +59,75 @@ class PlayerInfoParser {
 		return this.protocol.readCtx[type](buffer, offset)
 	}
 	static writeVal(type, value, buffer, offset) {
-		if(type instanceof Array) {
+		if(typeof type === 'object') {
 			if(type[0] === 'array') {
-				offset = this.writeVal(type[1].countType, value.length, buffer, offset);
-				for(let elem of value) {
-					offset = this.writeVal(type[1].type, elem, buffer, offset);
-				};
+				offset = this.writeVal(type[1].countType, value.length, buffer, offset)
+				for(let elem of value)
+					offset = this.writeVal(type[1].type, elem, buffer, offset)
 				return offset
 			}
 			else if(type[0] === 'container')
 			{
-				for(let elem of type[1]) {
-					offset = this.writeVal(elem.type, value[elem.name], buffer, offset);
-				};
+				for(let elem of type[1])
+					offset = this.writeVal(elem.type, value[elem.name], buffer, offset)
 				return offset
 			}
 		}
 		return this.protocol.writeCtx[type](value, buffer, offset)
 	}
 	static sizeOfVal(type, value) {
-		if(type instanceof Array) {
+		if(typeof type === 'object') {
 			if(type[0] === 'array') {
-				let size = this.sizeOfVal(type[1].countType, value.length);
-				for(let elem of value) {
-					size += this.sizeOfVal(type[1].type, elem);
-				};
+				let size = this.sizeOfVal(type[1].countType, value.length)
+				for(let elem of value)
+					size += this.sizeOfVal(type[1].type, elem)
 				return size
 			}
 			else if(type[0] === 'container')
 			{
-				let size = 0;
-				for(let elem of type[1]) {
-					size += this.sizeOfVal(elem.type, value[elem.name]);
-				};
+				let size = 0
+				for(let elem of type[1])
+					size += this.sizeOfVal(elem.type, value[elem.name])
 				return size
 			}
 		}
 		return this.protocol.sizeOfCtx[type](value)
 	}
 	static read(buffer, mask) {
-		if(typeof(mask) === 'number')
-				mask = this.convertMaskArr(mask)
-			else
-				mask = mask
-		let offset = 0;
-		let { value, size } = this.readVal("UInt", buffer, offset);
-		let arr = new Array(value)
-		offset += size;
+		if(typeof mask === 'number')
+			mask = this.convertMaskArray(mask)
+		let { value, size } = this.readVal("UInt", buffer, offset)
+		let offset = size
+		let array = new Array(value)
 		for(let i = 0; i < value; i++) {
-			let data = new Object(null);
+			let data = new Object(null)
 			for(let sig of PlayerInfoData) {
 				if(mask.indexOf(sig.name) !== -1) {
-					let { value, size } = this.readVal(sig.signature, buffer, offset);
-					offset += size;
+					let { value, size } = this.readVal(sig.signature, buffer, offset)
+					offset += size
 					data[sig.name] = value
 				}
-			};
-			arr[i] = data
+			}
+			array[i] = data
 		}
-		return arr
+		return array
 	}
-	static write(arr) {
-		let buffer = Buffer.allocUnsafe(this.sizeOf(arr));
-		let offset = 0;
-		offset = this.writeVal("UInt", arr.length, buffer, offset);
-		for(let elem of arr) {
-			for(let sig of PlayerInfoData) {
-				if(elem[sig.name] !== undefined) {
-					offset = this.writeVal(sig.signature, elem[sig.name], buffer, offset);
-				}
-			};
-		}
+	static write(array) {
+		let buffer = Buffer.allocUnsafe(this.sizeOf(array))
+		let offset = this.writeVal("UInt", array.length, buffer, offset)
+		for(let elem of array)
+			for(let sig of PlayerInfoData)
+				if(elem[sig.name] !== undefined)
+					offset = this.writeVal(sig.signature, elem[sig.name], buffer, offset)
 		return buffer
 	}
-	static sizeOf(arr) {
-		let size = 0;
-		size += this.sizeOfVal("UInt", arr.length);
-		for(let elem of arr) {
-			for(let sig of PlayerInfoData) {
-				if(elem[sig.name] !== undefined) {
-					size += this.sizeOfVal(sig.signature, elem[sig.name]);
-				}
-			};
-		}
+	static sizeOf(array) {
+		let size = 0
+		size += this.sizeOfVal("UInt", array.length)
+		for(let elem of array)
+			for(let sig of PlayerInfoData)
+				if(elem[sig.name] !== undefined)
+					size += this.sizeOfVal(sig.signature, elem[sig.name])
 		return size
 	}
 }

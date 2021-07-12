@@ -7,19 +7,21 @@
 const net = require('net')
 const EventEmitter2 = require('eventemitter2')
 
-const { Logger } = require('src/utils/logger')
-const { ServerClient } = require('src/net/server/client')
-const { PacketClient } = require('src/net/protocol')
+const { Logger } = require('@sq-lib/src/utils/logger')
+const { ServerClient } = require('@sq-lib/src/net/server/client')
+const { PacketClient } = require('@sq-lib/src/net/protocol')
 
 class Server extends EventEmitter2 {
 	constructor(options) {
-		super({wildcard: true});
-		this.options = options;
+		super({
+			wildcard: true
+		})
+		this.options = options
 		this.socket = new net.Server({
 			allowHalfOpen: false,
 			pauseOnConnect: true
-		});
-		this.clients = [];
+		})
+		this.clients = []
 		this.listenTo(
 			this.socket,
 			{
@@ -28,12 +30,12 @@ class Server extends EventEmitter2 {
 				error: 'server.error',
 				listening: 'server.listening'
 			}
-		);
-		this.on('server.connection', this.onconnect);
+		)
+		this.on('server.connection', this.onconnect)
 		this.on('client.close', this.ondisconnect)
 	}
 	listen() {
-		Logger.debug('net', 'Server.listen');
+		Logger.debug('net', 'Server.listen')
 		this.socket.listen(
 			{
 				port: this.options.port || 11111,
@@ -42,35 +44,35 @@ class Server extends EventEmitter2 {
 		 )
 	}
 	close() {
-		Logger.debug('net', 'Server.close');
-		this.socket.close();
+		Logger.debug('net', 'Server.close')
+		this.socket.close()
 		for(let client of this.clients)
 			client.close()
 	}
 	onconnect(socket) {
-		Logger.debug('net', 'Server.onconnect');
-		let client = new ServerClient(this.options, socket);
+		Logger.debug('net', 'Server.onconnect')
+		let client = new ServerClient(this.options, socket)
 		client.onAny((event, ...args) => {
 			this.emit(event, client, ...args)
-		});
-		this.clients.push(client);
+		})
+		this.clients.push(client)
 		if(!this.options.manualOpen)
 			client.open()
 		client.emit('client.connect')
 	}
 	ondisconnect(client) {
-		Logger.debug('net', 'Server.ondisconnect');
+		Logger.debug('net', 'Server.ondisconnect')
 		this.clients = this.clients.filter(e => e !== client)
 	}
 	sendPacketAll(type, func, ...params) {
-		Logger.debug('net', 'Server.sendPacketAll');
-		let packet = new PacketClient(type, ...params);
+		Logger.debug('net', 'Server.sendPacketAll')
+		let packet = new PacketClient(type, ...params)
 		this.sendMassData(packet, func)
 	}
 	sendDataAll(packet, func) {
-		Logger.debug('net', 'Server.sendDataAll');
+		Logger.debug('net', 'Server.sendDataAll')
 		for(let client of this.clients)
-			if(!func || func(client))
+			if(func === undefined || func(client))
 				client.sendData(packet)
 	}
 }

@@ -5,7 +5,7 @@
 //  Web:		https://s0viet.ru/
 
 module.exports = {
-	... require('src/utils/logger'),
-	... require('src/utils/playerInfoParser'),
-	... require('src/utils/wtfFileFormat')
+	... require('@sq-lib/src/utils/logger'),
+	... require('@sq-lib/src/utils/playerInfoParser'),
+	... require('@sq-lib/src/utils/wtfFileFormat')
 }

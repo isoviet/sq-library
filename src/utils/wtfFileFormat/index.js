@@ -8,44 +8,37 @@ const fs = require('fs')
 
 class WtfFileFormat {
     static readFileSync(path) {
-        let content = fs.readFileSync(path, 'utf8');
-        if(!content)
-            throw new Error('can\'t read "' + path + '"')
+        let content = fs.readFileSync(path, 'utf8')
+        if(content === undefined)
+            throw new Error(`unable to read "${path}"`)
         return content;
     }
     static parseValue(value) {
-        let char = value.substr(0, 1);
-        switch(char) {
-            case '"':
-            case "'":
-                if(char === value.substr(value.length - 1))
-                    return value.substr(1, value.length - 2)
-            default:
-                if(value.indexOf(".") !== -1)
-                    return parseFloat(value)
-                return parseInt(value, 10)
-        }
+        if(value.startsWith('"') && value.endsWith('"'))
+            return value.substr(1, value.length - 2)
+        if(value.includes('.'))
+            return parseFloat(value)
+        return parseInt(value, 10)
     }
     static parseContent(content) {
-        let data = {};
-        let last = data;
+        let data = {}
+        let last = data
         for(let line of raw.split('\n')) {
-            let [prefix, content] = lines[i].replace(/ +/g, ' ').match(/^([A-Z]+)*\s([\a-\z\A-\Z\0-\9\.\'\"\s]+);*/);
+            let [prefix, arg1, arg2] = lines[i].split(/\s+/)
+            if(!prefix)
+                continue
             switch(prefix) {
                 case 'CAT':
-                    last = data[this.parseValue(content)] = {}
+                    last = data[this.parseValue(arg1)] = {}
                 case 'SET':
-                    let [varName, varValue] = content.split(' ');
-                    last[varName] = this.parseValue(varValue);
-                    break
-                default:
+                    last[arg1] = this.parseValue(arg2)
             }
-        };
+        }
         return data
     }
     static read(path) {
-        let content = this.readFileSync(path);
-        let data = this.parseContent(content);
+        let content = this.readFileSync(path)
+        let data = this.parseContent(content)
         return data
     }
 }

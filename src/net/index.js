@@ -5,8 +5,8 @@
 //  Web:		https://s0viet.ru/
 
 module.exports = {
-	... require('src/net/protocol'),
-	... require('src/net/client'),
-	... require('src/net/server'),
-	... require('src/net/policyServer')
+	... require('@sq-lib/src/net/protocol'),
+	... require('@sq-lib/src/net/client'),
+	... require('@sq-lib/src/net/server'),
+	... require('@sq-lib/src/net/policyServer')
 }
