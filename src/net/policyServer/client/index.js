@@ -45,8 +45,6 @@ class PolicyServerClient extends EventEmitter2 {
 	}
 	ondata(chunk) {
 		Logger.debug('net', 'PolicyServerClient.ondata')
-		if(chunk === undefined)
-			return
 		this.state.readBytes += chunk.byteLength
 		if(this.state.readBytes > this.data.request.length)
 			throw new Error(`unexpected data: "${this.state.recv}"`)

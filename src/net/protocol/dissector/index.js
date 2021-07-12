@@ -28,7 +28,7 @@ class Dissector {
 			case DissectorStates.HEADER:
 				let added = chunk.copy(this.header, this.bytesRead - chunk.byteLength, 0)
 				if(this.bytesRead < Constants.PACKET_HEADER_SIZE)
-					return
+					return []
 				let length = this.header.readUInt32LE(0)
 				if(length > Constants.PACKET_MAX_SIZE)
 					throw new Error(`too big packet size: ${length}`)
@@ -42,7 +42,7 @@ class Dissector {
 				let excess = this.bytesRead - this.packet.byteLength
 				chunk.copy(this.packet, this.bytesRead - chunk.byteLength, 0, chunk.byteLength - Math.max(excess, 0))
 				if(excess < 0)
-					return
+					return []
 				this.reset()
 				if(excess > 0)
 					return [this.packet, chunk.slice(chunk.length - excess)]
