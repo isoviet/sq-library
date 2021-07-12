@@ -1,4 +1,4 @@
-//  Module:     main
+//  Module:     src
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
