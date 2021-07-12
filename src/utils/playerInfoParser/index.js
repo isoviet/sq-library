@@ -15,7 +15,7 @@ class PlayerInfoParser {
 		for(let sig of PlayerInfoData)
 			if(sig.name)
 				if(!!(mask & sig.mask) || sig.mask === 0)
-					arr.push(sig.name)
+					array.push(sig.name)
 		return array
 	}
 	static convertArrayMask(array) {
@@ -96,7 +96,7 @@ class PlayerInfoParser {
 	static read(buffer, mask) {
 		if(typeof mask === 'number')
 			mask = this.convertMaskArray(mask)
-		let { value, size } = this.readVal("UInt", buffer, offset)
+		let { value, size } = this.readVal("UInt", buffer, 0)
 		let offset = size
 		let array = new Array(value)
 		for(let i = 0; i < value; i++) {
@@ -114,7 +114,7 @@ class PlayerInfoParser {
 	}
 	static write(array) {
 		let buffer = Buffer.allocUnsafe(this.sizeOf(array))
-		let offset = this.writeVal("UInt", array.length, buffer, offset)
+		let offset = this.writeVal("UInt", array.length, buffer, 0)
 		for(let elem of array)
 			for(let sig of PlayerInfoData)
 				if(elem[sig.name] !== undefined)
