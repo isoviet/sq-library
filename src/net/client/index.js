@@ -57,7 +57,7 @@ class Client extends EventEmitter2 {
 			this.close(error)
 		}
 		if(packet !== undefined)
-			return this.emit('packet.incoming', packet, buffer)
+			return this.emit('packet.incoming', packet, result.buffer)
 		if(result.remainder !== undefined)
 			return this.ondata(result.remainder)
 	}
