@@ -15,7 +15,7 @@ const DissectorStates = {
 class Dissector {
 	constructor() {
 		this.header = Buffer.allocUnsafe(Constants.PACKET_HEADER_SIZE)
-		this.packet = null
+		this.buffer = null
 		this.reset()
 	}
 	reset() {
@@ -28,25 +28,28 @@ class Dissector {
 			case DissectorStates.HEADER:
 				let added = chunk.copy(this.header, this.bytesRead - chunk.byteLength, 0)
 				if(this.bytesRead < Constants.PACKET_HEADER_SIZE)
-					return []
+					return {}
 				let length = this.header.readUInt32LE(0)
 				if(length > Constants.PACKET_MAX_SIZE)
 					throw new Error(`too big packet size: ${length}`)
 				this.state = DissectorStates.PAYLOAD
-				this.packet = Buffer.allocUnsafe(length + Constants.PACKET_HEADER_SIZE)
-				this.packet.writeUInt32LE(length)
+				this.buffer = Buffer.allocUnsafe(length + Constants.PACKET_HEADER_SIZE)
+				this.buffer.writeUInt32LE(length)
 				if(this.bytesRead === Constants.PACKET_HEADER_SIZE)
-					return []
+					return {}
 				chunk = chunk.slice(added)
 			case DissectorStates.PAYLOAD:
-				let excess = this.bytesRead - this.packet.byteLength
-				chunk.copy(this.packet, this.bytesRead - chunk.byteLength, 0, chunk.byteLength - Math.max(excess, 0))
-				if(excess < 0)
-					return []
+				let remainder = this.bytesRead - this.buffer.byteLength
+				chunk.copy(this.buffer, this.bytesRead - chunk.byteLength, 0, chunk.byteLength - Math.max(remainder, 0))
+				if(remainder < 0)
+					return {}
 				this.reset()
-				if(excess > 0)
-					return [this.packet, chunk.slice(chunk.length - excess)]
-				return [this.packet]
+				if(remainder == 0)
+					return {buffer: this.buffer}
+				return {
+					buffer: this.buffer,
+					remainder: chunk.slice(chunk.length - remainder)
+				}
 			default:
 				throw new Error(`unknown state: ${this.state}`)
 		}

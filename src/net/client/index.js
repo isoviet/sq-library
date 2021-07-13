@@ -38,20 +38,28 @@ class Client extends EventEmitter2 {
 			host: this.options.host || '127.0.0.1'
 		})
 	}
-	close() {
+	close(error) {
 		Logger.debug('net', 'Client.close')
-		this.socket.destroy()
+		this.socket.destroy(error)
 	}
 	ondata(chunk) {
 		Logger.debug('net', 'Client.ondata')
-		let [buffer, excess] = this.dissector.read(chunk)
-		if(buffer === undefined)
-			return
-		let packet = PacketServer.from(buffer)
-		this.emit('packet.incoming', packet, buffer)
-		if(excess === undefined)
-			return
-		this.ondata(excess)
+		let result
+		try {
+			result = this.dissector.read(chunk)
+		} catch(error) {
+			return this.close(error)
+		}
+		let packet;
+		try {
+			packet = PacketServer.from(result.buffer)
+		} catch(error) {
+			this.close(error)
+		}
+		if(packet !== undefined)
+			return this.emit('packet.incoming', packet, buffer)
+		if(result.remainder !== undefined)
+			return this.ondata(excess)
 	}
 	sendPacket(type, ...data) {
 		Logger.debug('net', 'Client.sendPacket')
