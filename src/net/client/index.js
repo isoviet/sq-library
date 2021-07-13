@@ -50,7 +50,7 @@ class Client extends EventEmitter2 {
 		} catch(error) {
 			return this.close(error)
 		}
-		let packet;
+		let packet
 		try {
 			packet = PacketServer.from(result.buffer)
 		} catch(error) {
@@ -59,7 +59,7 @@ class Client extends EventEmitter2 {
 		if(packet !== undefined)
 			return this.emit('packet.incoming', packet, buffer)
 		if(result.remainder !== undefined)
-			return this.ondata(excess)
+			return this.ondata(result.remainder)
 	}
 	sendPacket(type, ...data) {
 		Logger.debug('net', 'Client.sendPacket')
