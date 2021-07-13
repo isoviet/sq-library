@@ -15,30 +15,42 @@ class Server extends EventEmitter2 {
 	constructor(options) {
 		super({wildcard: true})
 		this.options = options
-		this.socket = new net.Server({
-			allowHalfOpen: false,
-			pauseOnConnect: true
-		})
+		if(!(options.port instanceof Array))
+			options.port = [options.port]
+		this.servers = []
+		for(port of options.port) {
+			let server = {
+				port: port,
+				socket: new net.Server({
+					allowHalfOpen: false,
+					pauseOnConnect: true
+				})
+			}
+			this.listenTo(server.socket, {
+				close: 'server.close',
+				connection: 'server.connection',
+				error: 'server.error',
+				listening: 'server.listening'
+			})
+			this.servers.push(server)
+		}
 		this.clients = []
-		this.listenTo(this.socket, {
-			close: 'server.close',
-			connection: 'server.connection',
-			error: 'server.error',
-			listening: 'server.listening'
-		})
 		this.on('server.connection', this.onconnect)
 		this.on('client.close', this.ondisconnect)
 	}
 	listen() {
 		Logger.debug('net', 'Server.listen')
-		this.socket.listen({
-			port: this.options.port || 11111,
-			host: this.options.host || '0.0.0.0'
-		})
+		for(server of this.servers) {
+			server.socket.listen({
+				port: server.port,
+				host: this.options.host || '0.0.0.0'
+			})
+		}
 	}
 	close() {
 		Logger.debug('net', 'Server.close')
-		this.socket.close()
+		for(server of this.servers)
+			server.socket.close()
 		for(let client of this.clients)
 			client.close()
 	}
