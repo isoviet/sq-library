@@ -18,7 +18,7 @@ class Server extends EventEmitter2 {
 		if(!(options.port instanceof Array))
 			options.port = [options.port]
 		this.servers = []
-		for(port of options.port) {
+		for(let port of options.port) {
 			let server = {
 				port: port,
 				socket: new net.Server({
@@ -31,6 +31,8 @@ class Server extends EventEmitter2 {
 				connection: 'server.connection',
 				error: 'server.error',
 				listening: 'server.listening'
+			}, {
+				reducers: (args) => args.data.unshift(server.socket)
 			})
 			this.servers.push(server)
 		}
@@ -40,7 +42,7 @@ class Server extends EventEmitter2 {
 	}
 	listen() {
 		Logger.debug('net', 'Server.listen')
-		for(server of this.servers) {
+		for(let server of this.servers) {
 			server.socket.listen({
 				port: server.port,
 				host: this.options.host || '0.0.0.0'
@@ -49,7 +51,7 @@ class Server extends EventEmitter2 {
 	}
 	close() {
 		Logger.debug('net', 'Server.close')
-		for(server of this.servers)
+		for(let server of this.servers)
 			server.socket.close()
 		for(let client of this.clients)
 			client.close()
