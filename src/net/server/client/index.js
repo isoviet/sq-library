@@ -47,6 +47,8 @@ class ServerClient extends EventEmitter2 {
 		} catch(error) {
 			return this.close(error)
 		}
+		if(result.buffer === undefined)
+			return
 		let packet
 		try {
 			packet = PacketClient.from(result.buffer)
@@ -54,8 +56,9 @@ class ServerClient extends EventEmitter2 {
 			return this.close(error)
 		}
 		this.emit('packet.incoming', packet, result.buffer)
-		if(result.remainder !== undefined)
-			this.ondata(result.remainder)
+		if(result.remainder === undefined)
+			return
+		this.ondata(result.remainder)
 	}
 	sendPacket(type, data) {
 		Logger.debug('net', 'ServerClient.sendPacket')
