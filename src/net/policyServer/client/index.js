@@ -36,7 +36,14 @@ class PolicyServerClient extends EventEmitter2 {
 	}
 	open() {
 		Logger.debug('net', 'PolicyServerClient.open')
-		this.socket.on('data', (chunk) => this.ondata(chunk))
+		this.socket.on('data', (chunk) => {
+			try {
+				this.ondata(chunk)
+			} catch(error) {
+				this.emit('client.error', error)
+				this.close()
+			}
+		})
 		this.socket.resume()
 	}
 	close() {

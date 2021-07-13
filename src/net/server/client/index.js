@@ -32,7 +32,13 @@ class ServerClient extends EventEmitter2 {
 	}
 	open() {
 		Logger.debug('net', 'ServerClient.open')
-		this.socket.on('data', (chunk) => this.ondata(chunk))
+		this.socket.on('data', (chunk) => {
+			try {
+				this.ondata(chunk)
+			} catch(error) {
+				this.emit('packet.error', error)
+			}
+		})
 		this.socket.resume()
 	}
 	close() {

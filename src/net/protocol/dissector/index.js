@@ -36,7 +36,7 @@ class Dissector {
 				this.packet = Buffer.allocUnsafe(length + Constants.PACKET_HEADER_SIZE)
 				this.packet.writeUInt32LE(length)
 				if(this.bytesRead === Constants.PACKET_HEADER_SIZE)
-					break
+					return []
 				chunk = chunk.slice(added)
 			case DissectorStates.PAYLOAD:
 				let excess = this.bytesRead - this.packet.byteLength
