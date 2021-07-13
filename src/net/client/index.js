@@ -29,13 +29,7 @@ class Client extends EventEmitter2 {
 			ready: 'client.ready',
 			timeout: 'client.timeout'
 		})
-		this.socket.on('data', (chunk) => {
-			try {
-				this.ondata(chunk)
-			} catch(error) {
-				this.emit('packet.error', error)
-			}
-		})
+		this.socket.on('data', (chunk) => this.ondata(chunk))
 	}
 	open() {
 		Logger.debug('net', 'Client.open')

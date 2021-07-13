@@ -29,21 +29,12 @@ class PolicyServerClient extends EventEmitter2 {
 			lookup: 'client.lookup',
 			ready: 'client.ready',
 			timeout: 'client.timeout'
-		}, {
-			reducers: (event) => event.data.unshift(this)
 		})
 		this.socket.setTimeout(this.options.timeout || 45000)
 	}
 	open() {
 		Logger.debug('net', 'PolicyServerClient.open')
-		this.socket.on('data', (chunk) => {
-			try {
-				this.ondata(chunk)
-			} catch(error) {
-				this.emit('client.error', error)
-				this.close()
-			}
-		})
+		this.socket.on('data', (chunk) => this.ondata(chunk))
 		this.socket.resume()
 	}
 	close() {
