@@ -43,7 +43,7 @@ class Client extends EventEmitter2 {
 		this.socket.destroy(error)
 	}
 	ondata(chunk) {
-		Logger.debug('net', 'Client.ondata')
+		Logger.debug('net', 'ServerClient.ondata')
 		let result
 		try {
 			result = this.dissector.read(chunk)
@@ -54,12 +54,11 @@ class Client extends EventEmitter2 {
 		try {
 			packet = PacketServer.from(result.buffer)
 		} catch(error) {
-			this.close(error)
+			return this.close(error)
 		}
-		if(packet !== undefined)
-			return this.emit('packet.incoming', packet, result.buffer)
+		this.emit('packet.incoming', packet, result.buffer)
 		if(result.remainder !== undefined)
-			return this.ondata(result.remainder)
+			this.ondata(result.remainder)
 	}
 	sendPacket(type, ...data) {
 		Logger.debug('net', 'Client.sendPacket')

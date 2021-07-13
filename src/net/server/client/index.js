@@ -51,12 +51,11 @@ class ServerClient extends EventEmitter2 {
 		try {
 			packet = PacketClient.from(result.buffer)
 		} catch(error) {
-			this.close(error)
+			return this.close(error)
 		}
-		if(packet !== undefined)
-			return this.emit('packet.incoming', packet, result.buffer)
+		this.emit('packet.incoming', packet, result.buffer)
 		if(result.remainder !== undefined)
-			return this.ondata(result.remainder)
+			this.ondata(result.remainder)
 	}
 	sendPacket(type, data) {
 		Logger.debug('net', 'ServerClient.sendPacket')
