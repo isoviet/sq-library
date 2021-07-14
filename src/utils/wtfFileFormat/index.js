@@ -24,12 +24,13 @@ class WtfFileFormat {
         let data = new Object(null)
         let last = data
         for(let line of content.split('\n')) {
-            let [prefix, arg1, arg2] = lines[i].split(/\s+/)
+            let [prefix, arg1, arg2] = line.split(/\s+/)
             if(!prefix)
                 continue
             switch(prefix) {
                 case 'CAT':
                     last = data[this.parseValue(arg1)] = new Object(null)
+                    break
                 case 'SET':
                     last[arg1] = this.parseValue(arg2)
             }
