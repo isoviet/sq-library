@@ -6,6 +6,6 @@
 
 module.exports = {
 	... require('@sq-lib/src/utils/logger'),
-	... require('@sq-lib/src/utils/playerInfoParser'),
-	... require('@sq-lib/src/utils/wtfFileFormat')
+	... require('@sq-lib/src/utils/playerinfoparser'),
+	... require('@sq-lib/src/utils/wtffileformat')
 }

@@ -5,7 +5,7 @@
 //  Web:        https://s0viet.ru/
 
 const { Protocol } = require('@sq-lib/data/protocol')
-const { PlayerInfoParser } = require('@sq-lib/src/utils/playerInfoParser')
+const { PlayerInfoParser } = require('@sq-lib/src/utils/playerinfoparser')
 const { ProtoDefCompiler, CompiledProtodef } = require('protodef').Compiler
 
 const Compiler = new ProtoDefCompiler()
