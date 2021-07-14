@@ -39,6 +39,8 @@ class Server extends EventEmitter2 {
 		this.clients = []
 		this.on('server.connection', this.onconnect)
 		this.on('client.close', this.ondisconnect)
+		this.on('client.error', this.ondisconnect)
+		this.on('client.timeout', this.ondisconnect)
 	}
 	listen() {
 		Logger.debug('net', 'Server.listen')
@@ -65,7 +67,7 @@ class Server extends EventEmitter2 {
 			client.open()
 		client.emit('client.connect')
 	}
-	ondisconnect(client) {
+	ondisconnect(server, client) {
 		Logger.debug('net', 'Server.ondisconnect')
 		this.clients = this.clients.filter(e => e !== client)
 	}

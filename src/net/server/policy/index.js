@@ -32,9 +32,13 @@ class PolicyServer extends EventEmitter2 {
 			connection: 'server.connection',
 			error: 'server.error',
 			listening: 'server.listening'
+		}, {
+			reducers: (args) => args.data.unshift(this.server)
 		})
 		this.on('server.connection', this.onconnect)
 		this.on('server.close', this.ondisconnect)
+		this.on('client.error', this.ondisconnect)
+		this.on('client.timeout', this.ondisconnect)
 	}
 	listen() {
 		Logger.debug('net', 'PolicyServer.listen')
@@ -49,7 +53,7 @@ class PolicyServer extends EventEmitter2 {
 		for(let client of this.clients)
 			client.close()
 	}
-	onconnect(socket) {
+	onconnect(server, socket) {
 		Logger.debug('net', 'PolicyServer.onconnect')
 		let client = new PolicyServerClient(this.options, socket, this.data)
 		client.onAny((event, client, ...args) => this.emit(event, client, ...args))
@@ -58,7 +62,7 @@ class PolicyServer extends EventEmitter2 {
 			client.open()
 		client.emit('client.connect')
 	}
-	ondisconnect(client) {
+	ondisconnect(server, client) {
 		Logger.debug('net', 'PolicyServer.ondisconnect')
 		this.clients = this.clients.filter(e => e !== client)
 	}
