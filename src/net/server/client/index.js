@@ -17,7 +17,7 @@ class ServerClient extends EventEmitter2 {
 		this.options = options
 		this.socket = socket
 		this.dissector = new Dissector()
-		this.listenTo(this.socket, {
+		this.listenTo(socket, {
 			close: 'client.close',
 			connect: 'client.connect',
 			data: 'client.data',
@@ -28,7 +28,8 @@ class ServerClient extends EventEmitter2 {
 			ready: 'client.ready',
 			timeout: 'client.timeout'
 		})
-		this.socket.setTimeout(this.options.timeout || 45000)
+		socket.setNoDelay(Boolean(this.options.tcpNoDelay ?? 1))
+		socket.setTimeout(this.options.timeout ?? 45000)
 	}
 	open() {
 		Logger.debug('net', 'ServerClient.open')

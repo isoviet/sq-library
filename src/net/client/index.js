@@ -12,7 +12,7 @@ const { Dissector } = require('@sq-lib/src/net/protocol/dissector')
 const { PacketClient, PacketServer } = require('@sq-lib/src/net/protocol')
 
 class Client extends EventEmitter2 {
-	constructor(options, socket) {
+	constructor(options) {
 		super({wildcard: true})
 		this.options = options
 		this.socket = new net.Socket()
@@ -29,13 +29,15 @@ class Client extends EventEmitter2 {
 			ready: 'client.ready',
 			timeout: 'client.timeout'
 		})
+		this.socket.setNoDelay(options.tcpNoDelay ?? true)
+		this.socket.setTimeout(options.timeout ?? 45000)
 		this.socket.on('data', (chunk) => this.ondata(chunk))
 	}
 	open() {
 		Logger.debug('net', 'Client.open')
 		this.socket.connect({
-			port: this.options.port || 11111,
-			host: this.options.host || '127.0.0.1'
+			port: this.options.port ?? 11111,
+			host: this.options.host ?? '127.0.0.1'
 		})
 	}
 	close(error) {

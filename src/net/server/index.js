@@ -8,8 +8,8 @@ const net = require('net')
 const EventEmitter2 = require('eventemitter2')
 
 const { Logger } = require('@sq-lib/src/utils/logger')
-const { ServerClient } = require('@sq-lib/src/net/server/client')
 const { PacketClient } = require('@sq-lib/src/net/protocol')
+const { ServerClient } = require('@sq-lib/src/net/server/client')
 
 class Server extends EventEmitter2 {
 	constructor(options) {
@@ -45,7 +45,7 @@ class Server extends EventEmitter2 {
 		for(let server of this.servers) {
 			server.socket.listen({
 				port: server.port,
-				host: this.options.host || '0.0.0.0'
+				host: this.options.host ?? '0.0.0.0'
 			})
 		}
 	}
@@ -56,7 +56,7 @@ class Server extends EventEmitter2 {
 		for(let client of this.clients)
 			client.close()
 	}
-	onconnect(socket) {
+	onconnect(server, socket) {
 		Logger.debug('net', 'Server.onconnect')
 		let client = new ServerClient(this.options, socket)
 		client.onAny((event, ...args) => this.emit(event, client, ...args))
@@ -84,5 +84,6 @@ class Server extends EventEmitter2 {
 
 module.exports = {
 	Server: Server,
-	ServerClient: ServerClient
+	ServerClient: ServerClient,
+	... require('@sq-lib/src/net/server/policy')
 }

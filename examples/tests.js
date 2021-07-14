@@ -122,7 +122,9 @@ async function stepThree() {
         port: 843,
         host: '0.0.0.0',
         allowedPorts: [ 
-            11111
+            11111,
+            11211,
+            11311
         ]
     })
     policyServer.on('server.listening', () => {
@@ -130,11 +132,15 @@ async function stepThree() {
     })
     policyServer.listen()
     let server = new sq.Server({
-        port: 11111,
+        port: [
+            11111, 
+            11211, 
+            11311
+        ],
         host: '0.0.0.0'
     })
-    server.on('server.listening', () => {
-        log('main', `Сервер работает на ${server.options.host}:${server.options.port}\r\n`)
+    server.on('server.listening', (server) => {
+        log('main', `Сервер работает на ${server.address().address}:${server.address().port}`)
     })
     server.on('client.connect', (client) => {
         client.fakeClient = new sq.Client({
@@ -164,7 +170,7 @@ async function stepThree() {
                     if(client.sentMessage)
                         break
                     client.sentMessage = true
-                    log('main', `Вы вошли в игру как "${client.name}". Теперь отправьте любое сообщение в чат.`)
+                    log('main', `\r\nВы вошли в игру как "${client.name}". Теперь отправьте любое сообщение в чат.`)
                     client.sendPacket('PacketAdminMessage', {
                         'message': `Вы вошли в игру как "${client.name}". Теперь отправьте любое сообщение в чат.`
                     })
