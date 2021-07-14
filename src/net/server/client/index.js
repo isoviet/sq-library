@@ -36,9 +36,9 @@ class ServerClient extends EventEmitter2 {
 		this.socket.on('data', (chunk) => this.ondata(chunk))
 		this.socket.resume()
 	}
-	close() {
+	close(error) {
 		Logger.debug('net', 'ServerClient.close')
-		this.socket.destroy()
+		this.socket.destroy(error)
 	}
 	ondata(chunk) {
 		Logger.debug('net', 'ServerClient.ondata')
