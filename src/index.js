@@ -5,6 +5,7 @@
 //  Web:        https://s0viet.ru/
 
 module.exports = {
+	... require('@sq-lib/data'),
 	... require('@sq-lib/src/pkg'),
 	... require('@sq-lib/src/utils'),
 	... require('@sq-lib/src/net')
