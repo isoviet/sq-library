@@ -88,8 +88,7 @@ module.exports = ({
 		PLANET_SHOW: 360,
 		DIALOG_CTR: 361,
 		NEWS_SITE_REDIRECT: 376,
-
-		public static const LOGIN_SUCCESS: 0,
+		LOGIN_SUCCESS: 0,
 		LOGIN_FAILED: 1,
 		LOGIN_EXIST: 2,
 		LOGIN_BLOCKED: 3,
