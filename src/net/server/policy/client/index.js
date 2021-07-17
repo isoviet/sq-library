@@ -46,10 +46,10 @@ class PolicyServerClient extends EventEmitter2 {
 		Logger.debug('net', 'PolicyServerClient.ondata')
 		this.state.readBytes += chunk.byteLength
 		if(this.state.readBytes > this.data.request.length)
-			this.close(new Error(`unexpected data: "${this.state.recv}"`))
+			return this.close(new Error(`unexpected data: "${this.state.recv}"`))
 		this.state.recv += chunk.toString('latin1')
 		if(!this.data.request.startsWith(this.state.recv))
-			this.close(new Error(`unexpected data: "${this.state.recv}"`))
+			return this.close(new Error(`unexpected data: "${this.state.recv}"`))
 		if(this.state.recv !== this.data.request)
 			return
 		this.socket.end(this.data.content)
