@@ -1,4 +1,4 @@
-//  Module:     src/net/server
+//  Module:     GameServer
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
@@ -7,11 +7,11 @@
 const net = require('net')
 const EventEmitter2 = require('eventemitter2')
 
-const { Logger } = require('@sq-lib/src/utils/logger')
-const { PacketClient } = require('@sq-lib/src/net/protocol')
-const { ServerClient } = require('@sq-lib/src/net/server/client')
+const { Logger } = require('@sq-lib/utils/Logger')
+const { PacketClient } = require('@sq-lib/common/PacketClient')
+const { GameServerClient } = require('@sq-lib/server/GameServerClient')
 
-class Server extends EventEmitter2 {
+class GameServer extends EventEmitter2 {
 	constructor(options) {
 		super({wildcard: true})
 		this.options = options
@@ -37,13 +37,13 @@ class Server extends EventEmitter2 {
 			this.servers.push(server)
 		}
 		this.clients = []
-		this.on('server.connection', this.onconnect)
-		this.on('client.close', this.ondisconnect)
-		this.on('client.error', this.ondisconnect)
-		this.on('client.timeout', this.ondisconnect)
+		this.on('server.connection', this.onConnect)
+		this.on('client.close', this.onDisconnect)
+		this.on('client.error', this.onDisconnect)
+		this.on('client.timeout', this.onDisconnect)
 	}
 	listen() {
-		Logger.debug('net', 'Server.listen')
+		Logger.debug('net', 'GameServer.listen')
 		for(let server of this.servers) {
 			server.socket.listen({
 				port: server.port,
@@ -52,32 +52,32 @@ class Server extends EventEmitter2 {
 		}
 	}
 	close() {
-		Logger.debug('net', 'Server.close')
+		Logger.debug('net', 'GameServer.close')
 		for(let server of this.servers)
 			server.socket.close()
 		for(let client of this.clients)
 			client.close()
 	}
-	onconnect(server, socket) {
-		Logger.debug('net', 'Server.onconnect')
-		let client = new ServerClient(this.options, socket)
+	onConnect(server, socket) {
+		Logger.debug('net', 'GameServer.onConnect')
+		let client = new GameServerClient(this.options, socket)
 		client.onAny((event, ...args) => this.emit(event, client, ...args))
 		this.clients.push(client)
-		if(!this.options.manualOpen)
+		if(this.options.manualOpen !== true)
 			client.open()
 		client.emit('client.connect')
 	}
-	ondisconnect(server, client) {
-		Logger.debug('net', 'Server.ondisconnect')
+	onDisconnect(server, client) {
+		Logger.debug('net', 'GameServer.onDisconnect')
 		this.clients = this.clients.filter(e => e !== client)
 	}
-	sendPacketAll(type, func, ...params) {
-		Logger.debug('net', 'Server.sendPacketAll')
-		let packet = new PacketClient(type, ...params)
+	sendPacketAll(type, func, params) {
+		Logger.debug('net', 'GameServer.sendPacketAll')
+		let packet = new PacketServer(type, params)
 		this.sendMassData(packet, func)
 	}
 	sendDataAll(packet, func) {
-		Logger.debug('net', 'Server.sendDataAll')
+		Logger.debug('net', 'GameServer.sendDataAll')
 		for(let client of this.clients)
 			if(func === undefined || func(client))
 				client.sendData(packet)
@@ -85,7 +85,6 @@ class Server extends EventEmitter2 {
 }
 
 module.exports = {
-	Server: Server,
-	ServerClient: ServerClient,
-	... require('@sq-lib/src/net/server/policy')
+	GameServer: GameServer,
+	GameServerClient: GameServerClient
 }

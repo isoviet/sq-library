@@ -1,11 +1,11 @@
-//  Module:     src/net/protocol/dissector
+//  Module:     Dissector
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
 //  Web:        https://s0viet.ru/
 
-const { Logger } = require('@sq-lib/src/utils/logger')
-const { Constants } = require('@sq-lib/data/constants')
+const { Logger } = require('@sq-lib/utils/Logger')
+const { Constants } = require('@sq-lib/shared/Constants')
 
 const DissectorStates = {
 	HEADER: 0,

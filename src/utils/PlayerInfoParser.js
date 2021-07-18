@@ -1,10 +1,10 @@
-//  Module:     src/utils/playerinfoparser
+//  Module:     PlayerInfoParser
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
 //  Web:        https://s0viet.ru/
 
-const { PlayerInfoData } = require('@sq-lib/data/playerInfoData')
+const { PlayerInfoData } = require('@sq-lib/shared/PlayerInfoData')
 
 class PlayerInfoParser {
 	static setProtocol(protocol) {

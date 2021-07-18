@@ -1,10 +1,10 @@
-//  Module:     src/net/protocol/client
+//  Module:     PacketClient
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
 //  Web:        https://s0viet.ru/
 
-const { Protocol } = require('@sq-lib/data/protocol')
+const { Protocol } = require('@sq-lib/shared/Protocol')
 const { ProtoDefCompiler, CompiledProtodef } = require('protodef').Compiler
 
 const Compiler = new ProtoDefCompiler()

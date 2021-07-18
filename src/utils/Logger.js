@@ -1,4 +1,4 @@
-//  Module:     src/utils/logger
+//  Module:     Logger
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru

@@ -1,11 +1,11 @@
-//  Module:     src/net/protocol/server
+//  Module:     PacketServer
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
 //  Web:        https://s0viet.ru/
 
-const { Protocol } = require('@sq-lib/data/protocol')
-const { PlayerInfoParser } = require('@sq-lib/src/utils/playerinfoparser')
+const { Protocol } = require('@sq-lib/shared/Protocol')
+const { PlayerInfoParser } = require('@sq-lib/utils/PlayerInfoParser')
 const { ProtoDefCompiler, CompiledProtodef } = require('protodef').Compiler
 
 const Compiler = new ProtoDefCompiler()

@@ -1,4 +1,4 @@
-//  Module:     src/net/client
+//  Module:     GameClient
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
@@ -7,11 +7,12 @@
 const net = require('net')
 const EventEmitter2 = require('eventemitter2')
 
-const { Logger } = require('@sq-lib/src/utils/logger')
-const { Dissector } = require('@sq-lib/src/net/protocol/dissector')
-const { PacketClient, PacketServer } = require('@sq-lib/src/net/protocol')
+const { Logger } = require('@sq-lib/utils/Logger')
+const { Dissector } = require('@sq-lib/common/Dissector')
+const { PacketClient } = require('@sq-lib/common/PacketClient')
+const { PacketServer } = require('@sq-lib/common/PacketServer')
 
-class Client extends EventEmitter2 {
+class GameClient extends EventEmitter2 {
 	constructor(options) {
 		super({wildcard: true})
 		this.options = options
@@ -29,23 +30,23 @@ class Client extends EventEmitter2 {
 			ready: 'client.ready',
 			timeout: 'client.timeout'
 		})
-		this.socket.setNoDelay(options.tcpNoDelay ?? true)
+		this.socket.setNoDelay(Boolean(options.tcpNoDelay ?? 0))
 		this.socket.setTimeout(options.timeout ?? 45000)
-		this.socket.on('data', (chunk) => this.ondata(chunk))
+		this.socket.on('data', (chunk) => this.onData(chunk))
 	}
 	open() {
-		Logger.debug('net', 'Client.open')
+		Logger.debug('net', 'GameClient.open')
 		this.socket.connect({
 			port: this.options.port ?? 11111,
 			host: this.options.host ?? '127.0.0.1'
 		})
 	}
 	close(error) {
-		Logger.debug('net', 'Client.close')
+		Logger.debug('net', 'GameClient.close')
 		this.socket.destroy(error)
 	}
-	ondata(chunk) {
-		Logger.debug('net', 'Client.ondata')
+	onData(chunk) {
+		Logger.debug('net', 'GameClient.onData')
 		let result
 		try {
 			result = this.dissector.read(chunk)
@@ -58,20 +59,20 @@ class Client extends EventEmitter2 {
 		try {
 			packet = PacketServer.from(result.buffer)
 		} catch(error) {
-			return this.close(error)
+			return this.emit('packet.error', error) // packet level error
 		}
 		this.emit('packet.incoming', packet, result.buffer)
 		if(result.remainder === undefined)
 			return
-		this.ondata(result.remainder)
+		this.onData(result.remainder)
 	}
 	sendPacket(type, ...data) {
-		Logger.debug('net', 'Client.sendPacket')
+		Logger.debug('net', 'GameClient.sendPacket')
 		let packet = new PacketClient(type, ...data)
 		this.sendData(packet)
 	}
 	sendData(packet) {
-		Logger.debug('net', 'Client.sendData')
+		Logger.debug('net', 'GameClient.sendData')
 		packet.id = this.packetId++
 		let buffer = packet.toBuffer()
 		this.socket.write(buffer, () => this.emit('packet.outcoming', packet, buffer))
@@ -79,5 +80,5 @@ class Client extends EventEmitter2 {
 }
 
 module.exports = {
-	Client: Client
+	GameClient: GameClient
 }

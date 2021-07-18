@@ -1,4 +1,4 @@
-//  Module:     src/utils/wtfFileFormat
+//  Module:     WtfFileFormat
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru

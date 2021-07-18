@@ -1,13 +1,14 @@
-//  Module:     examples
+//  Module:     tests
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
 //  Web:        https://s0viet.ru/
 
 const equal = require('fast-deep-equal')
-const sq = require('../index.js')
+const { Logger, PacketClient, PacketServer, GameClient, GameServer, PolicyServer } = require('../index.js')
 
-sq.Logger.setOptions({
+const log = Logger.info
+Logger.setOptions({
     logFile: 0,
     debug: 0,
     info: 1,
@@ -15,9 +16,8 @@ sq.Logger.setOptions({
     error: 1,
     fatal: 1
 })
-const log = sq.Logger.info
 
-async function clear() {
+function clear() {
     console.clear()
     process.stdout.write('\033c')
 }
@@ -42,7 +42,7 @@ async function hello() {
 }
 
 async function stepOne() {
-    await clear()
+    clear()
     log('main', 'Тест #1\r\n\
     Сейчас будет создан тестовый пакет клиента.\r\n\
     Данный пакет будет сконвертирован в байтовое представление и обратно.\r\n\
@@ -52,11 +52,11 @@ async function stepOne() {
     \r\n\
     Нажмите любую клавишу для продолжения..\r\n')
     await pause()
-    let packet = new sq.PacketClient('LOGIN', BigInt(0), 1, 2, '#3', 4, 5, 'optional #6')
+    let packet = new PacketClient('LOGIN', BigInt(0), 1, 2, '#3', 4, 5, 'optional #6')
     let buffer = packet.toBuffer()
     log('main', 'Пакет:\r\n', packet, '\r\n')
     log('main', 'Байты:\r\n', buffer, '\r\n')
-    let packet2 = sq.PacketClient.from(buffer)
+    let packet2 = PacketClient.from(buffer)
     packet2.data[0] = packet2.data[0].valueOf()
     let buffer2 = packet2.toBuffer()
     log('main', 'Пакет:\r\n', packet2, '\r\n')
@@ -68,7 +68,7 @@ async function stepOne() {
 }
 
 async function stepTwo() {
-    await clear()
+    clear()
     log('main', 'Тест #2\r\n\
     Сейчас будет создан тестовый пакет сервера.\r\n\
     Данный пакет будет сконвертирован в байтовое представление и обратно.\r\n\
@@ -78,7 +78,7 @@ async function stepTwo() {
     \r\n\
     Нажмите любую клавишу для продолжения..\r\n')
     await pause()
-    let packet = new sq.PacketServer(
+    let packet = new PacketServer(
         'PacketLogin', 
         {
             "status": 0,
@@ -93,7 +93,7 @@ async function stepTwo() {
     let buffer = packet.toBuffer()
     log('main', 'Пакет:\r\n', packet, '\r\n')
     log('main', 'Байты:\r\n', buffer, '\r\n')
-    let packet2 = sq.PacketServer.from(buffer)
+    let packet2 = PacketServer.from(buffer)
     for(key of Object.keys(packet2.data))
         if(packet2.data[key] === undefined)
             delete packet2.data[key]
@@ -107,18 +107,18 @@ async function stepTwo() {
 }
 
 async function stepThree() {
-    await clear()
+    clear()
     let resolve
     log('main', 'Тест #3\r\n\
     Сейчас будет создан тестовый сервер-сниффер.\r\n\
     Вам необходимо зайти на сервер и войти в игру.\r\n\
     \r\n\
     Цель теста: проверка работы.\r\n\
-    Использованные классы: Server, PolicyServer, Client.\r\n\
+    Использованные классы: GameServer, GameClient, PolicyServer.\r\n\
     \r\n\
     Нажмите любую клавишу для продолжения..\r\n')
     await pause()
-    let policyServer = new sq.PolicyServer({
+    let policyServer = new PolicyServer({
         port: 843,
         host: '0.0.0.0',
         allowedPorts: [ 
@@ -131,25 +131,26 @@ async function stepThree() {
         log('main', `Сервер политики работает на ${policyServer.options.host}:${policyServer.options.port}`)
     })
     policyServer.listen()
-    let server = new sq.Server({
+    let server = new GameServer({
         port: [
             11111, 
             11211, 
             11311
         ],
-        host: '0.0.0.0'
+        host: '0.0.0.0',
+        manualOpen: true
     })
-    server.on('server.listening', (server) => {
-        log('main', `Сервер работает на ${server.address().address}:${server.address().port}`)
-    })
+    server.on('server.listening', (server) => log('main', `Сервер работает на ${server.address().address}:${server.address().port}`))
     server.on('client.connect', (client) => {
-        client.fakeClient = new sq.Client({
+        let proxy = new GameClient({
             'port': 11111,
             'host': '88.212.206.137'
         })
-        client.fakeClient.on('client.connect', client.open)
-        client.fakeClient.on('client.close', client.close)
-        client.fakeClient.on('packet.incoming', (packet, buffer) => {
+        proxy.on('client.connect', () => client.open())
+        proxy.on('client.close', () => client.close())
+        proxy.on('client.error', (error) => client.close())
+        proxy.on('client.timeout', () => client.close())
+        proxy.on('packet.incoming', (packet, buffer) => {
             switch(packet.type) {
                 case 'PacketLogin':
                     client.uid = packet.data.innerId
@@ -177,7 +178,8 @@ async function stepThree() {
             }
             client.sendData(packet)
         })
-        client.fakeClient.open()
+        client.proxy = proxy
+        proxy.open()
     })
     server.on('packet.incoming', async (client, packet) => {
         switch(packet.type) {
@@ -188,11 +190,11 @@ async function stepThree() {
                 resolve()
                 return
         }
-        client.fakeClient.sendData(packet)
+        client.proxy.sendData(packet)
     })
-    server.on('client.close', (client) => {
-        client.fakeClient.close()
-    })
+    server.on('client.close', (client) => client.proxy.close())
+    server.on('client.error', (client, error) => client.proxy.close())
+    server.on('client.timeout', (client) => client.proxy.close())
     server.listen()
     return new Promise((r) => {
         resolve = r
@@ -200,7 +202,7 @@ async function stepThree() {
 }
 
 async function stepFour() {
-    await clear()
+    clear()
     log('main', 'Тесты пройдены\r\n\
     Вы успешно завершили все тесты sq-lib.\r\n\
     \r\n\

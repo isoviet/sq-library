@@ -1,4 +1,4 @@
-//  Module:     src/net/policyServer
+//  Module:     PolicyServer
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
@@ -7,9 +7,9 @@
 const net = require('net')
 const EventEmitter2 = require('eventemitter2')
 
-const { Logger } = require('@sq-lib/src/utils/logger')
-const { Constants } = require('@sq-lib/data/constants')
-const { PolicyServerClient } = require('@sq-lib/src/net/server/policy/client')
+const { Logger } = require('@sq-lib/utils/Logger')
+const { Constants } = require('@sq-lib/shared/Constants')
+const { PolicyServerClient } = require('@sq-lib/server/PolicyServerClient')
 
 class PolicyServer extends EventEmitter2 {
 	constructor(options) {
@@ -35,10 +35,10 @@ class PolicyServer extends EventEmitter2 {
 		}, {
 			reducers: (args) => args.data.unshift(this.server)
 		})
-		this.on('server.connection', this.onconnect)
-		this.on('server.close', this.ondisconnect)
-		this.on('client.error', this.ondisconnect)
-		this.on('client.timeout', this.ondisconnect)
+		this.on('server.connection', this.onConnect)
+		this.on('server.close', this.onDisconnect)
+		this.on('client.error', this.onDisconnect)
+		this.on('client.timeout', this.onDisconnect)
 	}
 	listen() {
 		Logger.debug('net', 'PolicyServer.listen')
@@ -53,17 +53,17 @@ class PolicyServer extends EventEmitter2 {
 		for(let client of this.clients)
 			client.close()
 	}
-	onconnect(server, socket) {
-		Logger.debug('net', 'PolicyServer.onconnect')
+	onConnect(server, socket) {
+		Logger.debug('net', 'PolicyServer.onConnect')
 		let client = new PolicyServerClient(this.options, socket, this.data)
 		client.onAny((event, client, ...args) => this.emit(event, client, ...args))
 		this.clients.push(client)
-		if(!this.options.manualOpen)
+		if(this.options.manualOpen !== true)
 			client.open()
 		client.emit('client.connect')
 	}
-	ondisconnect(server, client) {
-		Logger.debug('net', 'PolicyServer.ondisconnect')
+	onDisconnect(server, client) {
+		Logger.debug('net', 'PolicyServer.onDisconnect')
 		this.clients = this.clients.filter(e => e !== client)
 	}
 }

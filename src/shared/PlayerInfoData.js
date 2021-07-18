@@ -1,4 +1,4 @@
-//  Module:     data
+//  Module:     PlayerInfoData
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
