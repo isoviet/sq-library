@@ -59,7 +59,7 @@ class GameClient extends EventEmitter2 {
 		try {
 			packet = PacketServer.from(result.buffer)
 		} catch(error) {
-			return this.emit('packet.error', error) // packet level error
+			return this.emit('packet.error', error)
 		}
 		this.emit('packet.incoming', packet, result.buffer)
 		if(result.remainder === undefined)
