@@ -7,7 +7,7 @@
 const net = require('net')
 const EventEmitter2 = require('eventemitter2')
 
-const { Logger } = require('@sq-lib/utils/Logger')
+const { Logger } = require('@sq-lib/common/utils/Logger')
 
 class PolicyServerClient extends EventEmitter2 {
 	constructor(options, socket, data) {

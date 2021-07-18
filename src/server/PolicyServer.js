@@ -7,7 +7,7 @@
 const net = require('net')
 const EventEmitter2 = require('eventemitter2')
 
-const { Logger } = require('@sq-lib/utils/Logger')
+const { Logger } = require('@sq-lib/common/utils/Logger')
 const { Constants } = require('@sq-lib/shared/Constants')
 const { PolicyServerClient } = require('@sq-lib/server/PolicyServerClient')
 

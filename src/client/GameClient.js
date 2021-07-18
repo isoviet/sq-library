@@ -7,7 +7,7 @@
 const net = require('net')
 const EventEmitter2 = require('eventemitter2')
 
-const { Logger } = require('@sq-lib/utils/Logger')
+const { Logger } = require('@sq-lib/common/utils/Logger')
 const { Dissector } = require('@sq-lib/common/Dissector')
 const { PacketClient } = require('@sq-lib/common/PacketClient')
 const { PacketServer } = require('@sq-lib/common/PacketServer')

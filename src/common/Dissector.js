@@ -4,7 +4,6 @@
 //  E-mail:     soviet@s0viet.ru
 //  Web:        https://s0viet.ru/
 
-const { Logger } = require('@sq-lib/utils/Logger')
 const { Constants } = require('@sq-lib/shared/Constants')
 
 const DissectorStates = {
