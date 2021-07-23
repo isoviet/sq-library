@@ -69,7 +69,7 @@ class GameServer extends EventEmitter2 {
 	}
 	onDisconnect(server, client) {
 		Logger.debug('net', 'GameServer.onDisconnect')
-		this.clients = this.clients.filter(e => e !== client)
+		this.clients = this.clients.filter(e => e.socket !== client.socket)
 	}
 	sendPacketAll(type, func, params) {
 		Logger.debug('net', 'GameServer.sendPacketAll')

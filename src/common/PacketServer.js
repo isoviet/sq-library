@@ -28,12 +28,10 @@ class PacketServer {
 	toBuffer() {
 		let buffer = ProtocolServer.createPacketBuffer('packet', {
 			... this,
-			... {
-				'data': this.type == 'PacketInfo' || this.type == 'PacketInfoNet' ? {
-					'data': PlayerInfoParser.write(this.data.data),
-					'mask': this.data.mask
-				} : this.data
-			}
+			'data': this.type == 'PacketInfo' || this.type == 'PacketInfoNet' ? {
+				'data': PlayerInfoParser.write(this.data.data),
+				'mask': this.data.mask
+			} : this.data
 		})
 		this.length = buffer.byteLength - 4
 		buffer.writeUInt32LE(this.length, 0)
@@ -43,15 +41,11 @@ class PacketServer {
 		let packet = ProtocolServer.parsePacketBuffer('packet', buffer).data
 		return Object.assign(new this(), {
 			... packet,
-			... {
-				'data': packet.type == 'PacketInfo' || packet.type == 'PacketInfoNet' ? {
-					'data': PlayerInfoParser.read(packet.data.data, packet.data.mask),
-					'mask': packet.data.mask
-				} : packet.data
-			},
-			... {
-				'length': buffer.byteLength - 4
-			}
+			'data': packet.type == 'PacketInfo' || packet.type == 'PacketInfoNet' ? {
+				'data': PlayerInfoParser.read(packet.data.data, packet.data.mask),
+				'mask': packet.data.mask
+			} : packet.data,
+			'length': buffer.byteLength - 4
 		})
 	}
 }

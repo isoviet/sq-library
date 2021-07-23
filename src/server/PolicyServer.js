@@ -64,7 +64,7 @@ class PolicyServer extends EventEmitter2 {
 	}
 	onDisconnect(server, client) {
 		Logger.debug('net', 'PolicyServer.onDisconnect')
-		this.clients = this.clients.filter(e => e !== client)
+		this.clients = this.clients.filter(e => e.socket !== client.socket)
 	}
 }
 

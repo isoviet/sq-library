@@ -32,9 +32,7 @@ class PacketClient {
 	static from(buffer) {
 		return Object.assign(new this(), {
 			... ProtocolClient.parsePacketBuffer('packet', buffer).data,
-			... {
-				'length': buffer.byteLength - 4
-			}
+			'length': buffer.byteLength - 4
 		})
 	}
 }
