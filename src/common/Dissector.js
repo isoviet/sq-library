@@ -4,7 +4,7 @@
 //  E-mail:     soviet@s0viet.ru
 //  Web:        https://s0viet.ru/
 
-const { Constants } = require('@sq-lib/shared/Constants')
+const { ProtocolData } = require('@sq-lib/shared/Constants').Constants
 
 const DissectorStates = {
 	HEADER: 0,
@@ -13,7 +13,7 @@ const DissectorStates = {
 
 class Dissector {
 	constructor() {
-		this.header = Buffer.allocUnsafe(Constants.PACKET_HEADER_SIZE)
+		this.header = Buffer.allocUnsafe(ProtocolData.PACKET_HEADER_SIZE)
 		this.buffer = null
 		this.reset()
 	}
@@ -26,15 +26,15 @@ class Dissector {
 		switch(this.state) {
 			case DissectorStates.HEADER:
 				let added = chunk.copy(this.header, this.bytesRead - chunk.byteLength, 0)
-				if(this.bytesRead < Constants.PACKET_HEADER_SIZE)
+				if(this.bytesRead < ProtocolData.PACKET_HEADER_SIZE)
 					return {}
 				let length = this.header.readUInt32LE(0)
-				if(length > Constants.PACKET_MAX_SIZE)
+				if(length > ProtocolData.PACKET_MAX_SIZE)
 					throw new Error(`too big packet size: ${length}`)
 				this.state = DissectorStates.PAYLOAD
-				this.buffer = Buffer.allocUnsafe(length + Constants.PACKET_HEADER_SIZE)
+				this.buffer = Buffer.allocUnsafe(length + ProtocolData.PACKET_HEADER_SIZE)
 				this.buffer.writeUInt32LE(length)
-				if(this.bytesRead === Constants.PACKET_HEADER_SIZE)
+				if(this.bytesRead === ProtocolData.PACKET_HEADER_SIZE)
 					return {}
 				chunk = chunk.slice(added)
 			case DissectorStates.PAYLOAD:

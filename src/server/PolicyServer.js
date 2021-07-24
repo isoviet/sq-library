@@ -8,7 +8,7 @@ const net = require('net')
 const EventEmitter2 = require('eventemitter2')
 
 const { Logger } = require('@sq-lib/common/utils/Logger')
-const { Constants } = require('@sq-lib/shared/Constants')
+const { ProtocolData } = require('@sq-lib/shared/Constants').Constants
 const { PolicyServerClient } = require('@sq-lib/server/PolicyServerClient')
 
 class PolicyServer extends EventEmitter2 {
@@ -20,8 +20,8 @@ class PolicyServer extends EventEmitter2 {
 			pauseOnConnect: true
 		})
 		this.data = {
-			request: Constants.POLICY_FILE_REQUEST,
-			content: Constants.POLICY_FILE_CONTENT.replace(
+			request: ProtocolData.POLICY_FILE_REQUEST,
+			content: ProtocolData.POLICY_FILE_CONTENT.replace(
 				'%0',
 				(options.allowedPorts ?? [11111]).join(',')
 			)
