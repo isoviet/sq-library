@@ -1,14 +1,14 @@
-//  Module:     PlayerInfoParser
+//  Module:     ClanInfoParser
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru
 //  Web:        https://s0viet.ru/
 
 const { InfoParser } = require('@sq-lib/common/utils/InfoParser')
-const { PlayerInfoData } = require('@sq-lib/shared/PlayerInfoData')
+const { ClanInfoData } = require('@sq-lib/shared/ClanInfoData')
 
-const PlayerInfoParser = new InfoParser(PlayerInfoData)
+const ClanInfoParser = new InfoParser(ClanInfoData)
 
 module.exports = {
-	PlayerInfoParser: PlayerInfoParser
+	ClanInfoParser: ClanInfoParser
 }

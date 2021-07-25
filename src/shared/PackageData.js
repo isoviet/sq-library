@@ -1,4 +1,4 @@
-//  Module:     Package
+//  Module:     PackageData
 //  Project:    sq-lib
 //  Author:     soviet
 //  E-mail:     soviet@s0viet.ru

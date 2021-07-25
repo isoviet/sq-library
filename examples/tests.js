@@ -8,14 +8,7 @@ const equal = require('fast-deep-equal')
 const { Logger, PacketClient, PacketServer, GameClient, GameServer, PolicyServer } = require('../index.js')
 
 const log = Logger.info
-Logger.setOptions({
-    logFile: 0,
-    debug: 0,
-    info: 1,
-    warn: 1,
-    error: 1,
-    fatal: 1
-})
+Logger.setOptions({logFile: 0, debug: 0, info: 1, warn: 1, error: 1, fatal: 1})
 
 function clear() {
     console.clear()

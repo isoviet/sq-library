@@ -4,14 +4,14 @@
 //  E-mail:     soviet@s0viet.ru
 //  Web:        https://s0viet.ru/
 
-const { Protocol } = require('@sq-lib/shared/Protocol')
+const { ProtocolData } = require('@sq-lib/shared/ProtocolData')
 const { ProtoDefCompiler, CompiledProtodef } = require('protodef').Compiler
 
 const Compiler = new ProtoDefCompiler()
 const ProtocolClient = new CompiledProtodef(
-	Compiler.sizeOfCompiler.compile(Protocol.client.sizeOfCode),
-	Compiler.writeCompiler.compile(Protocol.client.writeCode),
-	Compiler.readCompiler.compile(Protocol.client.readCode)
+	Compiler.sizeOfCompiler.compile(ProtocolData.client.sizeOfCode),
+	Compiler.writeCompiler.compile(ProtocolData.client.writeCode),
+	Compiler.readCompiler.compile(ProtocolData.client.readCode)
 )
 
 class PacketClient {
@@ -30,10 +30,13 @@ class PacketClient {
 		return buffer
 	}
 	static from(buffer) {
-		return Object.assign(new this(), {
-			... ProtocolClient.parsePacketBuffer('packet', buffer).data,
-			'length': buffer.byteLength - 4
-		})
+		let data = ProtocolClient.parsePacketBuffer('packet', buffer).data
+		let packet = new this()
+		packet.length = buffer.byteLength - 4
+		packet.id = data.id
+		packet.type = data.type
+		packet.data = data.data
+		return packet
 	}
 }
 

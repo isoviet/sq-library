@@ -4,7 +4,7 @@
 //  E-mail:     soviet@s0viet.ru
 //  Web:        https://s0viet.ru/
 
-const { ProtocolData } = require('@sq-lib/shared/Constants').Constants
+const { ProtocolData } = require('@sq-lib/shared/ProtocolData')
 
 const DissectorStates = {
 	HEADER: 0,
