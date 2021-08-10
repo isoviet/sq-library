@@ -10,22 +10,32 @@ const EventEmitter2 = require('eventemitter2')
 const { Logger } = require('@sq-lib/common/utils/Logger')
 const { PacketClient } = require('@sq-lib/common/PacketClient')
 const { GameServerClient } = require('@sq-lib/server/GameServerClient')
+const { Protection } = require('@sq-lib/common/Protection')
 
 class GameServer extends EventEmitter2 {
 	constructor(options) {
 		super({wildcard: true})
 		this.options = options
+		options.port = options.port ?? [11111]
 		if(!(options.port instanceof Array))
 			options.port = [options.port]
+		options.backlog = options.backlog ?? 10
+		options.tcpNoDelay = Boolean(options.tcpNoDelay ?? 0)
+		options.timeout = options.timeout ?? 35000
+		options.maxConns = options.maxConns ?? 5000
+		options.maxConnsPerIp = options.maxConnsPerIp ?? 3
+		options.maxConnsPerIpTimeout = options.maxConnsPerIpTimeout ?? 1000
 		this.servers = []
 		for(let port of options.port) {
 			let server = {
 				port: port,
 				socket: new net.Server({
 					allowHalfOpen: false,
-					pauseOnConnect: true
+					pauseOnConnect: true,
+					backlog: options.backlog
 				})
 			}
+			server.maxConnections = options.maxPlayers
 			this.listenTo(server.socket, {
 				close: 'server.close',
 				connection: 'server.connection',
@@ -37,7 +47,7 @@ class GameServer extends EventEmitter2 {
 			this.servers.push(server)
 		}
 		this.clients = []
-		this.on('server.connection', this.onConnect)
+		this.on('server.connection', Protection.onConnect.bind(this))
 		this.on('client.close', this.onDisconnect)
 		this.on('client.error', this.onDisconnect)
 		this.on('client.timeout', this.onDisconnect)

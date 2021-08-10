@@ -30,8 +30,8 @@ class PolicyServerClient extends EventEmitter2 {
 			ready: 'client.ready',
 			timeout: 'client.timeout'
 		})
-		socket.setNoDelay(Boolean(options.tcpNoDelay ?? 0))
-		socket.setTimeout(options.timeout ?? 45000)
+		socket.setNoDelay(options.tcpNoDelay)
+		socket.setTimeout(options.timeout)
 		socket.on('data', (chunk) => this.onData(chunk))
 	}
 	open() {

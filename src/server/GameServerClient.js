@@ -29,8 +29,8 @@ class GameServerClient extends EventEmitter2 {
 			ready: 'client.ready',
 			timeout: 'client.timeout'
 		})
-		socket.setNoDelay(Boolean(this.options.tcpNoDelay ?? 0))
-		socket.setTimeout(this.options.timeout ?? 45000)
+		socket.setNoDelay(options.tcpNoDelay)
+		socket.setTimeout(options.timeout)
 		socket.on('data', (chunk) => this.onData(chunk))
 	}
 	open() {

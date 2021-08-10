@@ -10,20 +10,30 @@ const EventEmitter2 = require('eventemitter2')
 const { Logger } = require('@sq-lib/common/utils/Logger')
 const { ProtocolData } = require('@sq-lib/shared/ProtocolData')
 const { PolicyServerClient } = require('@sq-lib/server/PolicyServerClient')
+const { Protection } = require('@sq-lib/common/Protection')
 
 class PolicyServer extends EventEmitter2 {
 	constructor(options) {
 		super({wildcard: true})
 		this.options = options
+		options.allowedPorts = options.allowedPorts ?? [11111]
+		options.backlog = options.backlog ?? 10
+		options.tcpNoDelay = Boolean(options.tcpNoDelay ?? 0)
+		options.timeout = options.timeout ?? 35000
+		options.maxConns = options.maxConns ?? 5000
+		options.maxConnsPerIP = options.maxConnsPerIP ?? 1
+		options.maxConnsPerIpTimeout = options.maxConnsPerIpTimeout ?? 1000
 		this.server = new net.Server({
 			allowHalfOpen: false,
-			pauseOnConnect: true
+			pauseOnConnect: true,
+			backlog: options.backlog
 		})
+		this.server.maxConnections = options.maxPlayers
 		this.data = {
 			request: ProtocolData.POLICY_FILE_REQUEST,
 			content: ProtocolData.POLICY_FILE_CONTENT.replace(
 				'%0',
-				(options.allowedPorts ?? [11111]).join(',')
+				options.allowedPorts.join(',')
 			)
 		}
 		this.clients = []
@@ -35,7 +45,7 @@ class PolicyServer extends EventEmitter2 {
 		}, {
 			reducers: (args) => args.data.unshift(this.server)
 		})
-		this.on('server.connection', this.onConnect)
+		this.on('server.connection', Protection.onConnect.bind(this))
 		this.on('server.close', this.onDisconnect)
 		this.on('client.error', this.onDisconnect)
 		this.on('client.timeout', this.onDisconnect)
