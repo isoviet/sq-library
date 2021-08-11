@@ -1,7 +1,7 @@
 {
     "name": "sq-lib",
     "description": "Squirrels Library is a library for creating client-server software based on the \"Squirrels game\" protocol",
-    "version": "2.3",
+    "version": "2.4",
     "keywords": [
         "binary",
         "protocol",

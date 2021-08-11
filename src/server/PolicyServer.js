@@ -17,26 +17,18 @@ class PolicyServer extends EventEmitter2 {
 		super({wildcard: true})
 		this.options = options
 		options.allowedPorts = options.allowedPorts ?? [11111]
-		options.backlog = options.backlog ?? 10
 		options.tcpNoDelay = Boolean(options.tcpNoDelay ?? 0)
-		options.timeout = options.timeout ?? 35000
+		options.timeout = options.timeout ?? 18000
 		options.maxConns = options.maxConns ?? 5000
+		options.maxConnsQueue = options.maxConnsQueue ?? 100
 		options.maxConnsPerIP = options.maxConnsPerIP ?? 1
-		options.maxConnsPerIpTimeout = options.maxConnsPerIpTimeout ?? 1000
+		options.maxConnsPerIpCloseNew = Boolean(options.maxConnsPerIpCloseNew ?? 1)
 		this.server = new net.Server({
 			allowHalfOpen: false,
 			pauseOnConnect: true,
-			backlog: options.backlog
+			backlog: options.maxConnsQueue
 		})
-		this.server.maxConnections = options.maxPlayers
-		this.data = {
-			request: ProtocolData.POLICY_FILE_REQUEST,
-			content: ProtocolData.POLICY_FILE_CONTENT.replace(
-				'%0',
-				options.allowedPorts.join(',')
-			)
-		}
-		this.clients = []
+		this.server.maxConnections = options.maxConns
 		this.listenTo(this.server, {
 			close: 'server.close',
 			connection: 'server.connection',
@@ -45,7 +37,16 @@ class PolicyServer extends EventEmitter2 {
 		}, {
 			reducers: (args) => args.data.unshift(this.server)
 		})
-		this.on('server.connection', Protection.onConnect.bind(this))
+		this.policyData = {
+			request: ProtocolData.POLICY_FILE_REQUEST,
+			content: ProtocolData.POLICY_FILE_CONTENT.replace(
+				'%0',
+				options.allowedPorts.join(',')
+			)
+		}
+		this.clients = []
+		this.protection = new Protection(this)
+		this.on('server.connection', this.protection.onConnect.bind(this.protection))
 		this.on('server.close', this.onDisconnect)
 		this.on('client.error', this.onDisconnect)
 		this.on('client.timeout', this.onDisconnect)
@@ -65,7 +66,7 @@ class PolicyServer extends EventEmitter2 {
 	}
 	onConnect(server, socket) {
 		Logger.debug('net', 'PolicyServer.onConnect')
-		let client = new PolicyServerClient(this.options, socket, this.data)
+		let client = new PolicyServerClient(this.options, socket, this.policyData)
 		client.onAny((event, client, ...args) => this.emit(event, client, ...args))
 		this.clients.push(client)
 		if(this.options.manualOpen !== true)

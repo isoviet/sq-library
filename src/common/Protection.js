@@ -7,29 +7,36 @@
 const max = Math.max
 
 class Protection {
-	static onConnect = {
-		bind: (server) => {
-			return (socketServer, socketClient) => {
-				let timeout = server.options.maxConnsPerIpTimeout
-				let closed = this.closeExcessConns(server, socketClient)
-				if(closed == 0)
-					server.onConnect(socketServer, socketClient)
-				else
-					setTimeout(server.onConnect.bind(server), timeout, socketServer, socketClient)
+	constructor(server) {
+		this.onConnect = server.onConnect
+		this.socketsByIp = server.socketsByIp = {}
+		this.closeNew = server.options.maxConnsPerIpCloseNew
+		this.maxConns = server.options.maxConnsPerIp
+	}
+	onConnect(server, socket) {
+		let ip = socket.address().address
+		let conns = this.socketsByIp[ip] = this.socketsByIp[ip] ?? []
+		let closed = this.closeExcessConns(conns, socket, ip)
+		if(closed == 0) {
+			this.server.onConnect(server, socket)
+		} else {
+			if(!this.closeNew) {
+				this.server.onConnect(server, socket)
+			} else {
+				socket.destroy()
+				this.server.emit('client.fail', ip, new Error('"maxConnsPerIp" limit exceeded!'))
 			}
+			this.socketsByIp[ip] = this.socketsByIp[ip].filter(e => e.readyState !== 'closed')
+			if(conns.length === 0)
+				delete this.socketsByIp[ip]
 		}
 	}
-	static closeExcessConns(server, socketClient) {
-		let maxConns = server.options.maxConnsPerIp
-		let conns = []
-		let ip = socketClient.address().address
-		for(let c of server.clients)
-			if(c.socket.address().address === ip)
-				conns.push(c.socket)
-		conns.push(socketClient)
-		let closed = conns.length - maxConns
+	closeExcessConns(socket, ip) {
+		conns.push(socket)
+		let closed = this.socketsByIp[ip].length - this.maxConns
 		for(let i = 0; i < closed; i++) {
-			conns[i].destroy(new Error('"maxConnsPerIp" limit exceeded!'))
+			socket.destroy()
+			this.server.emit('client.fail', ip, new Error('"maxConnsPerIp" limit exceeded!'))
 		}
 		return max(closed, 0)
 	}

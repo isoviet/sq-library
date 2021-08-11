@@ -10,11 +10,11 @@ const EventEmitter2 = require('eventemitter2')
 const { Logger } = require('@sq-lib/common/utils/Logger')
 
 class PolicyServerClient extends EventEmitter2 {
-	constructor(options, socket, data) {
+	constructor(options, socket, policyData) {
 		super({wildcard: true})
 		this.options = options
 		this.socket = socket
-		this.data = data
+		this.policyData = policyData
 		this.state = {
 			readBytes: 0x0,
 			recv: ''
@@ -45,14 +45,14 @@ class PolicyServerClient extends EventEmitter2 {
 	onData(chunk) {
 		Logger.debug('net', 'PolicyServerClient.onData')
 		this.state.readBytes += chunk.byteLength
-		if(this.state.readBytes > this.data.request.length)
+		if(this.state.readBytes > this.policyData.request.length)
 			return this.close(new Error(`unexpected data: "${this.state.recv}"`))
 		this.state.recv += chunk.toString('latin1')
-		if(!this.data.request.startsWith(this.state.recv))
+		if(!this.policyData.request.startsWith(this.state.recv))
 			return this.close(new Error(`unexpected data: "${this.state.recv}"`))
-		if(this.state.recv !== this.data.request)
+		if(this.state.recv !== this.policyData.request)
 			return
-		this.sendData(this.data.content, () => this.close())
+		this.sendData(this.policyData.content, () => this.close())
 	}
 	sendData(data, onSend) {
 		this.socket.write(data, onSend)
