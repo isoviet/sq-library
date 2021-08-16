@@ -8,7 +8,7 @@ const max = Math.max
 
 class Protection {
 	constructor(server) {
-		this.onConnect = server.onConnect
+		this.onConnect = server.onConnect.bind(server)
 		this.socketsByIp = server.socketsByIp = {}
 		this.closeNew = server.options.maxConnsPerIpCloseNew
 		this.maxConns = server.options.maxConnsPerIp
