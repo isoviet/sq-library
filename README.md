@@ -20,7 +20,7 @@
    |\_________\|___| \__\        \|_______|\|__|\|_______|
    \|_________|     \|__|                SQUIRRELS LIBRARY                
    
-https://vk.com/idbestmax 
+https://vk.com/sovietxd 
 ~~~
 ## О проекте
 
