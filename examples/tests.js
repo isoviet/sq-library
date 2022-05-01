@@ -165,11 +165,11 @@ async function stepThree() {
                         break
                     client.sentMessage = true
                     log('main', `\r\nВы вошли в игру как "${client.name}". Теперь отправьте любое сообщение в чат.`)
-                    client.sendPacket('PacketAdminMessage', {
+                    client.sendData('PacketAdminMessage', {
                         'message': `Вы вошли в игру как "${client.name}". Теперь отправьте любое сообщение в чат.`
                     })
             }
-            client.sendData(packet)
+            client.sendPacket(packet)
         })
         client.proxy = proxy
         proxy.open()
@@ -183,7 +183,7 @@ async function stepThree() {
                 resolve()
                 return
         }
-        client.proxy.sendData(packet)
+        client.proxy.sendPacket(packet)
     })
     server.on('client.close', (client) => client.proxy.close())
     server.on('client.error', (client, error) => client.proxy.close())

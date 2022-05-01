@@ -66,13 +66,13 @@ class GameClient extends EventEmitter2 {
 			return
 		this.onData(result.remainder)
 	}
-	sendPacket(type, ...data) {
-		Logger.debug('net', 'GameClient.sendPacket')
-		let packet = new PacketClient(type, ...data)
-		this.sendData(packet)
-	}
-	sendData(packet) {
+	sendData(type, ...data) {
 		Logger.debug('net', 'GameClient.sendData')
+		let packet = new PacketClient(type, ...data)
+		this.sendPacket(packet)
+	}
+	sendPacket(packet) {
+		Logger.debug('net', 'GameClient.sendPacket')
 		packet.id = this.packetId++
 		let buffer = packet.toBuffer()
 		this.socket.write(buffer, () => this.emit('packet.outcoming', packet, buffer))

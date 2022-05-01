@@ -62,13 +62,13 @@ class GameServerClient extends EventEmitter2 {
 			return
 		this.onData(result.remainder)
 	}
-	sendPacket(type, data) {
-		Logger.debug('net', 'GameServerClient.sendPacket')
-		let packet = new PacketServer(type, data)
-		this.sendData(packet)
-	}
-	sendData(packet) {
+	sendData(type, data) {
 		Logger.debug('net', 'GameServerClient.sendData')
+		let packet = new PacketServer(type, data)
+		this.sendPacket(packet)
+	}
+	sendPacket(packet) {
+		Logger.debug('net', 'GameServerClient.sendPacket')
 		let buffer = packet.toBuffer()
 		this.socket.write(buffer, () => this.emit('packet.outcoming', packet, buffer))
 	}
