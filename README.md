@@ -1,4 +1,4 @@
-# ![logo](https://sovlet.github.io/belki/media/icons/icon64.png) Squirrels Library
+# ![logo](https://minsoviet.github.io/belki/media/icons/icon64.png) Squirrels Library
 
 ![](https://app.codacy.com/project/badge/Grade/a4aaac3dc8fa48f5b39398e4f685f4dd) ![](https://img.shields.io/badge/coverage-100%25-lime) ![](https://img.shields.io/badge/issues-0-lime)
 
